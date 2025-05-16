@@ -21,6 +21,9 @@ public class FacturaPrincipal {
         factura.setIva(115.00);
         factura.setCliente(cliente);
 
+
+        System.out.println(factura.toString());
+
     }
 
 }
