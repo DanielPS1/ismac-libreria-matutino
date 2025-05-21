@@ -12,7 +12,7 @@ public class LibroPrincipal {
         Libro libro = new Libro();
 
         Categoria categoria = new Categoria(1,"Accion","Informacion Area 51");
-        Autor autor = new Autor(1,"Jose","Perez","Peru","Piura","5314578920","joseperez11@gmail.com");
+        Autor autor = new Autor(1,"Jesus","Perez","Peru","Piura","5314578920","joseperez11@gmail.com");
 
         libro.setIdLibro(1);
         libro.setTitulo("Area 51");
