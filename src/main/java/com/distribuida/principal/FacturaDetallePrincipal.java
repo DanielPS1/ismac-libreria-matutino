@@ -14,7 +14,7 @@ public class FacturaDetallePrincipal {
 
         facturaDetalle.setIdFacturaDetalle(1);
         facturaDetalle.setCantidad(12);
-        facturaDetalle.setSubtotal(35.5);
+        facturaDetalle.setSubtotal(38.5);
         facturaDetalle.setLibro(libro);
         facturaDetalle.setFactura(factura);
 

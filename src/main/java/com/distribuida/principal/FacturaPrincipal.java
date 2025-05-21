@@ -17,8 +17,8 @@ public class FacturaPrincipal {
         factura.setIdFactura(1);
         factura.setNumFactura("FAC-0001");
         factura.setFecha(new Date());
-        factura.setTotalNeto(100.00);
-        factura.setIva(115.00);
+        factura.setTotalNeto(150.00);
+        factura.setIva(165.00);
         factura.setCliente(cliente);
 
 
