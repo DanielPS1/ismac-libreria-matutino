@@ -23,12 +23,12 @@ public class ClienteTest {
     public void testClienteConstructorandGetter(){
         assertAll("Validar datos Cliente, Constructor y Getters",
                 () -> assertEquals(1, cliente.getIdCliente()),
-                () -> assertEquals("1753352515", cliente.getCedula()),
-                () -> assertEquals("Ara", cliente.getNombre()),
-                () -> assertEquals("Chupin", cliente.getApellido()),
-                () -> assertEquals("Tumbaco", cliente.getDireccion()),
-                () -> assertEquals("911", cliente.getTelefono()),
-                () -> assertEquals("pepe@gmail.com", cliente.getCorreo())
+                () -> assertEquals("17434123312", cliente.getCedula()),
+                () -> assertEquals("Jesus", cliente.getNombre()),
+                () -> assertEquals("Taipa", cliente.getApellido()),
+                () -> assertEquals("Av. Americas", cliente.getDireccion()),
+                () -> assertEquals("077899955", cliente.getTelefono()),
+                () -> assertEquals("dasdeasd@gmail.com", cliente.getCorreo())
         );
     }
 
