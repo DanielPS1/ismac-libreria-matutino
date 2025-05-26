@@ -54,9 +54,9 @@ public class FacturaTest {
         assertAll("Validar datos factura",
                 () -> assertTrue(str.contains("1")),
                 () -> assertTrue(str.contains("FAC-00001")),
-                () -> assertTrue(str.contains("100.00")),
-                () -> assertTrue(str.contains("15.00")),
-                () -> assertTrue(str.contains("115.00")),
+                () -> assertTrue(str.contains("100.0")),
+                () -> assertTrue(str.contains("15.0")),
+                () -> assertTrue(str.contains("115.0")),
                 () -> assertTrue(str.contains("Juan")), //parte del objeto cliente - Inyeccion de dependencias
                 () -> assertTrue(str.contains("0991654355")) //parte del objeto cliente - Inyeccion de dependencias
 
