@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class FacturaTest {
 
@@ -44,6 +43,25 @@ public class FacturaTest {
                 () -> assertEquals("Juan", factura.getCliente().getNombre())
 
         );
+
+    }
+
+
+
+    @Test
+    public void testFacturaToString(){
+        String str = factura.toString();
+        assertAll("Validar datos factura",
+                () -> assertTrue(str.contains("1")),
+                () -> assertTrue(str.contains("FAC-00001")),
+                () -> assertTrue(str.contains("100.00")),
+                () -> assertTrue(str.contains("15.00")),
+                () -> assertTrue(str.contains("115.00")),
+                () -> assertTrue(str.contains("Juan")), //parte del objeto cliente - Inyeccion de dependencias
+                () -> assertTrue(str.contains("0991654355")) //parte del objeto cliente - Inyeccion de dependencias
+
+                );
+
 
     }
 
