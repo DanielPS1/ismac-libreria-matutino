@@ -7,9 +7,10 @@ import com.distribuida.entities.Libro;
 public class FacturaDetallePrincipal {
 
     public static void main(String[] args) {
-        FacturaDetalle facturaDetalle = new FacturaDetalle();
         Libro libro = new Libro();
         Factura factura = new Factura();
+
+        FacturaDetalle facturaDetalle = new FacturaDetalle(1, 12, 38.5, libro, factura);
 
 
         facturaDetalle.setIdFacturaDetalle(1);
