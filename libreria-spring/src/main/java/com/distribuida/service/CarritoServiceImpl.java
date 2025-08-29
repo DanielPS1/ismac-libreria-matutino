@@ -10,6 +10,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.UUID;
 
 
 @Service
@@ -133,14 +135,25 @@ public class CarritoServiceImpl implements CarritoService{
     @Override
     @Transactional
     public Carrito getOrCreateByToken(String token) {
-        var c = new Carrito();
-        c.setToken(token);
-        c.setSubtotal(BigDecimal.ZERO);
-        c.setDescuento(BigDecimal.ZERO);
-        c.setImpuestos(BigDecimal.ZERO);
-        c.setTotal(BigDecimal.ZERO);
-        return carritoRepository.save(c);
+        // Si no se recibe token, se genera uno único
+        if(token == null || token.isEmpty()) {
+            token = UUID.randomUUID().toString();
+        }
+
+        String finalToken = token;
+        return carritoRepository.findByToken(token)
+                .orElseGet(() -> {
+                    var c = new Carrito();
+                    c.setToken(finalToken);
+                    c.setSubtotal(BigDecimal.ZERO);
+                    c.setDescuento(BigDecimal.ZERO);
+                    c.setImpuestos(BigDecimal.ZERO);
+                    c.setTotal(BigDecimal.ZERO);
+                    c.setItems(new ArrayList<>()); // inicializa la lista de items
+                    return carritoRepository.save(c);
+                });
     }
+
 
     @Override
     @Transactional

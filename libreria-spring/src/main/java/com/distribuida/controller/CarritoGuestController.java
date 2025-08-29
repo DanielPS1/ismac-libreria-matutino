@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/guest/cart")
@@ -18,9 +19,14 @@ public class CarritoGuestController {
     }
 
     @PostMapping
-    public ResponseEntity<Carrito> createOrGet(@RequestParam String token){
+    public ResponseEntity<Carrito> createOrGet(@RequestParam(required = false) String token){
+        // Si no se recibe token, se genera uno único
+        if(token == null || token.isEmpty()) {
+            token = UUID.randomUUID().toString();
+        }
         return ResponseEntity.ok(carritoService.getOrCreateByToken(token));
     }
+
 
     @GetMapping
     public ResponseEntity<Carrito> get(@RequestParam String token){

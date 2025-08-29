@@ -39,41 +39,57 @@ public class GuestCheckoutServiceImpl implements GuestCheckoutService {
     @Override
     @Transactional
     public Factura checkoutByToken(String token) {
+        // Validar token
+        if (token == null || token.isEmpty()) {
+            throw new IllegalArgumentException("Token inválido");
+        }
+
+        // Obtener carrito
         var carrito = carritoRepository.findByToken(token)
-                .orElseThrow(() ->new IllegalArgumentException("No existe carrito para el token"));
-        if (carrito.getItems() == null || carrito.getItems().isEmpty()){
+                .orElseThrow(() -> new IllegalArgumentException("No existe carrito para el token"));
+
+        // Validar que tenga items
+        if (carrito.getItems() == null || carrito.getItems().isEmpty()) {
             throw new IllegalArgumentException("El carrito está vacío");
         }
-        for (var item: carrito.getItems()){
+
+        System.out.println("Procesando checkout para token: " + token + ", items: " + carrito.getItems().size());
+
+        // Validar stock
+        for (var item : carrito.getItems()) {
             var libro = item.getLibro();
-            if (libro.getNumEjemplares() < item.getCantidad()){
-                throw new IllegalArgumentException("Stock insuficiente para: "+ libro.getTitulo());
+            if (libro.getNumEjemplares() < item.getCantidad()) {
+                throw new IllegalArgumentException("Stock insuficiente para: " + libro.getTitulo());
             }
         }
 
-
-        for(var item: carrito.getItems()){
+        // Actualizar stock de libros
+        for (var item : carrito.getItems()) {
             var libro = item.getLibro();
             libro.setNumEjemplares(libro.getNumEjemplares() - item.getCantidad());
             libroRepository.save(libro);
         }
 
-        String numFactura = "F-"+ DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
-                .format(LocalDateTime.now());
+        // Generar número de factura
+        String numFactura = "F-" + DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(LocalDateTime.now());
 
+        // Construir factura
         var factura = CheckoutMapper.construirFacturaDesdeCarrito(carrito, numFactura, IVA);
-
         factura = facturaRepository.save(factura);
-        for (var item: carrito.getItems()){
-            var det = CheckoutMapper.construirDetalle(factura, item);
-            facturaDetalleRepository.save(det);
+
+        // Guardar detalles de factura
+        for (var item : carrito.getItems()) {
+            var detalle = CheckoutMapper.construirDetalle(factura, item);
+            facturaDetalleRepository.save(detalle);
         }
 
+        // Vaciar carrito
         carrito.getItems().clear();
         carritoRepository.save(carrito);
 
-
+        System.out.println("Checkout completado para token: " + token + ", factura: " + numFactura);
 
         return factura;
     }
+
 }
