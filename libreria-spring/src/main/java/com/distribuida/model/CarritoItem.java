@@ -10,7 +10,7 @@ import java.math.RoundingMode;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "carrito_item"
-        , uniqueConstraints = @UniqueConstraint(columnNames = {"is_carrito", "id_libro"}))
+        , uniqueConstraints = @UniqueConstraint(columnNames = {"id_carrito", "id_libro"}))
 public class CarritoItem {
 
     @Id

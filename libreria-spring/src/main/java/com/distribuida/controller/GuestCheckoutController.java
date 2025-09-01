@@ -17,39 +17,57 @@ import java.util.Map;
 public class GuestCheckoutController {
 
     private final GuestCheckoutService guestCheckoutService;
-    private final CarritoService carritoService; // << agregar
+    private final CarritoService carritoService;
 
     public GuestCheckoutController(GuestCheckoutService checkoutService,
-                                   CarritoService carritoService){ // << inyectar
+                                   CarritoService carritoService) {
         this.guestCheckoutService = checkoutService;
         this.carritoService = carritoService;
     }
 
     @PostMapping
-    public ResponseEntity<?> checkout(@RequestParam String token){
+    public ResponseEntity<?> checkout(@RequestParam String token) {
         try {
-            // Obtener o crear carrito
-            Carrito carrito = carritoService.getOrCreateByToken(token);
+            System.out.println("=== INICIO CHECKOUT ===");
+            System.out.println("Token recibido: " + token);
+
+            // Usar getByToken en lugar de getOrCreateByToken
+            Carrito carrito = carritoService.getByToken(token);
+
+            if (carrito == null) {
+                System.out.println("ERROR: Carrito no encontrado para token: " + token);
+                return ResponseEntity
+                        .badRequest()
+                        .body(Map.of("message", "Carrito no encontrado. Token inválido o expirado"));
+            }
+
+            System.out.println("Carrito encontrado. Items: " +
+                    (carrito.getItems() != null ? carrito.getItems().size() : 0));
 
             if (carrito.getItems() == null || carrito.getItems().isEmpty()) {
+                System.out.println("ERROR: Carrito vacío");
                 return ResponseEntity
                         .badRequest()
                         .body(Map.of("message", "Carrito vacío, no se puede procesar el checkout"));
             }
 
+            System.out.println("Procesando checkout...");
             Factura factura = guestCheckoutService.checkoutByToken(token);
+
+            System.out.println("=== CHECKOUT EXITOSO ===");
             return ResponseEntity.ok(factura);
 
         } catch (IllegalArgumentException e) {
+            System.out.println("ERROR: " + e.getMessage());
             return ResponseEntity
                     .badRequest()
                     .body(Map.of("message", e.getMessage()));
         } catch (Exception e) {
-            e.printStackTrace(); // Para depuración
+            System.out.println("ERROR INTERNO: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity
                     .status(500)
                     .body(Map.of("message", "Error interno en el servidor"));
         }
     }
-
 }

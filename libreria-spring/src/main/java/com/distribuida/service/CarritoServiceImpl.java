@@ -13,10 +13,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.UUID;
 
-
 @Service
-public class CarritoServiceImpl implements CarritoService{
-
+public class CarritoServiceImpl implements CarritoService {
 
     private final CarritoRepository carritoRepository;
     private final CarritoItemRepository carritoItemRepository;
@@ -26,22 +24,21 @@ public class CarritoServiceImpl implements CarritoService{
     private static final BigDecimal IVA = new BigDecimal("0.15");
 
     public CarritoServiceImpl(CarritoRepository carritoRepository
-                              , CarritoItemRepository carritoItemRepository
-                              , ClienteRepository clienteRepository
-                              ,LibroRepository libroRepository
-                            ){
+            , CarritoItemRepository carritoItemRepository
+            , ClienteRepository clienteRepository
+            , LibroRepository libroRepository
+    ) {
         this.carritoRepository = carritoRepository;
         this.carritoItemRepository = carritoItemRepository;
         this.clienteRepository = clienteRepository;
         this.libroRepository = libroRepository;
-
     }
 
     @Override
     @Transactional
     public Carrito getOrCreateByClienteId(int clienteId, String token) {
         var cliente = clienteRepository.findById(clienteId)
-                .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado"+ clienteId));
+                .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado" + clienteId));
         var carritoOpt = carritoRepository.findByCliente(cliente);
         if (carritoOpt.isPresent()) return carritoOpt.get();
 
@@ -61,16 +58,16 @@ public class CarritoServiceImpl implements CarritoService{
 
         var carrito = getOrCreateByClienteId(clienteId, null);
         var libro = libroRepository.findById(libroId)
-                .orElseThrow(() -> new IllegalArgumentException("Libro no encontrado: "+ libroId));
+                .orElseThrow(() -> new IllegalArgumentException("Libro no encontrado: " + libroId));
 
         var itemOpt = carritoItemRepository.findByCarritoAndLibro(carrito, libro);
-        if (itemOpt.isPresent()){
+        if (itemOpt.isPresent()) {
             var item = itemOpt.get();
             item.setCantidad(item.getCantidad() + cantidad);
             item.setPrecioUnitario(BigDecimal.valueOf(libro.getPrecio()));
             item.calcTotal();
             carritoItemRepository.save(item);
-        }else {
+        } else {
             var item = new CarritoItem();
             item.setCarrito(carrito);
             item.setLibro(libro);
@@ -79,8 +76,6 @@ public class CarritoServiceImpl implements CarritoService{
             item.calcTotal();
             carrito.getItems().add(item);
         }
-
-
 
         carrito.recomputarTotales(IVA);
         return carritoRepository.save(carrito);
@@ -93,11 +88,11 @@ public class CarritoServiceImpl implements CarritoService{
 
         var carrito = getByClienteId(clienteId);
         var item = carritoItemRepository.findById(carritoItemId)
-                .orElseThrow(() -> new IllegalArgumentException("Item no encontrado"+carritoItemId));
-        if (nuevaCantidad == 0){
+                .orElseThrow(() -> new IllegalArgumentException("Item no encontrado" + carritoItemId));
+        if (nuevaCantidad == 0) {
             carrito.getItems().remove(item);
             carritoItemRepository.delete(item);
-        }else {
+        } else {
             item.setCantidad(nuevaCantidad);
             carritoItemRepository.save(item);
         }
@@ -108,22 +103,22 @@ public class CarritoServiceImpl implements CarritoService{
     @Override
     @Transactional
     public void removeItem(int clienteId, long carritoItemId) {
-    updateItemCantidad(clienteId, carritoItemId, 0);
+        updateItemCantidad(clienteId, carritoItemId, 0);
     }
 
     @Override
     @Transactional
     public void clear(int clienteId) {
-    var carrito = getByClienteId(clienteId);
-    carrito.getItems().clear();
-    carrito.recomputarTotales(IVA);
-    carritoRepository.save(carrito);
+        var carrito = getByClienteId(clienteId);
+        carrito.getItems().clear();
+        carrito.recomputarTotales(IVA);
+        carritoRepository.save(carrito);
     }
 
     @Override
     public Carrito getByClienteId(int clienteId) {
         var cliente = clienteRepository.findById(clienteId)
-                .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado"+clienteId));
+                .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado" + clienteId));
         return carritoRepository.findByCliente(cliente)
                 .orElseGet(() -> {
                     var c = new Carrito();
@@ -136,7 +131,7 @@ public class CarritoServiceImpl implements CarritoService{
     @Transactional
     public Carrito getOrCreateByToken(String token) {
         // Si no se recibe token, se genera uno único
-        if(token == null || token.isEmpty()) {
+        if (token == null || token.isEmpty()) {
             token = UUID.randomUUID().toString();
         }
 
@@ -154,14 +149,13 @@ public class CarritoServiceImpl implements CarritoService{
                 });
     }
 
-
     @Override
     @Transactional
     public Carrito addItem(String token, int libroId, int cantidad) {
         if (cantidad <= 0) throw new IllegalArgumentException("Cantidad debe ser > 0 ");
         var carrito = getOrCreateByToken(token);
         var libro = libroRepository.findById(libroId)
-                .orElseThrow(() -> new IllegalArgumentException("Libro no encontrado: "+libroId));
+                .orElseThrow(() -> new IllegalArgumentException("Libro no encontrado: " + libroId));
         var itemOpt = carritoItemRepository.findByCarritoAndLibro(carrito, libro);
         if (itemOpt.isPresent()) {
             var item = itemOpt.get();
@@ -169,7 +163,7 @@ public class CarritoServiceImpl implements CarritoService{
             item.setPrecioUnitario(BigDecimal.valueOf(libro.getPrecio()));
             item.calcTotal();
             carritoItemRepository.save(item);
-        }else {
+        } else {
             var item = new CarritoItem();
             item.setCarrito(carrito);
             item.setLibro(libro);
@@ -186,12 +180,12 @@ public class CarritoServiceImpl implements CarritoService{
     public Carrito updateItemCantidad(String token, long carritoItemId, int nuevaCantidad) {
         var carrito = getOrCreateByToken(token);
         var item = carritoItemRepository.findById(carritoItemId)
-                .orElseThrow(() -> new IllegalArgumentException("Item no encontrado: "+ carritoItemId));
+                .orElseThrow(() -> new IllegalArgumentException("Item no encontrado: " + carritoItemId));
 
-        if (nuevaCantidad <= 0 ){
+        if (nuevaCantidad <= 0) {
             carrito.getItems().remove(item);
             carritoItemRepository.delete(item);
-        }else {
+        } else {
             item.setCantidad(nuevaCantidad);
             item.calcTotal();
             carritoItemRepository.save(item);
@@ -221,16 +215,12 @@ public class CarritoServiceImpl implements CarritoService{
     @Override
     @Transactional
     public Carrito getByToken(String token) {
+        if (token == null || token.isEmpty()) {
+            return null;
+        }
 
+        // ✅ SOLO BUSCAR - NO CREAR NUEVO CARRIITO
         return carritoRepository.findByToken(token)
-                .orElseGet(() -> {
-                    var c = new Carrito();
-                    c.setToken(token);
-                    c.setSubtotal(BigDecimal.ZERO);
-                    c.setDescuento(BigDecimal.ZERO);
-                    c.setImpuestos(BigDecimal.ZERO);
-                    c.setTotal(BigDecimal.ZERO);
-                    return c;
-                });
+                .orElse(null);  // ← Cambio crucial aquí
     }
 }
