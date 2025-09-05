@@ -15,6 +15,7 @@ public class LibroServiceImpl implements LibroService {
     @Autowired
     private LibroRepository libroRepository;
 
+    // cambios de repositorio
     @Autowired
     private CategoriaRepository categoriaRepository;
 
@@ -39,15 +40,11 @@ public class LibroServiceImpl implements LibroService {
     }
 
     @Override
-    public Libro update(int id, int idlibro, Libro libro) {
-        Libro libroExistente = findOne(id);
+    public Libro update(int idLibro, Libro libro) {
+        Libro libroExistente = findOne(idLibro);
+        if (libroExistente == null) return null;
 
-        Optional<Categoria> categoriaExistente = categoriaRepository.findById(id);
-        Optional<Autor> autorExistente = autorRepository.findById(id);
-
-        if (libroExistente == null){
-            return null;
-        }
+        // Actualiza campos básicos
         libroExistente.setTitulo(libro.getTitulo());
         libroExistente.setEditorial(libro.getEditorial());
         libroExistente.setNumPaginas(libro.getNumPaginas());
@@ -61,16 +58,34 @@ public class LibroServiceImpl implements LibroService {
         libroExistente.setPortada(libro.getPortada());
         libroExistente.setPresentacion(libro.getPresentacion());
         libroExistente.setPrecio(libro.getPrecio());
-        libroExistente.setCategoria(categoriaExistente.orElse(null));
-        libroExistente.setAutor((autorExistente.orElse(null)));
+
+// Actualiza autor
+        if (libro.getAutor() != null) {
+            Integer idAut = libro.getAutor().getIdAutor();
+            if (idAut != null) {
+                Autor autor = autorRepository.findById(idAut).orElse(null);
+                libroExistente.setAutor(autor);
+            }
+        }
+
+// Actualiza categoría
+        if (libro.getCategoria() != null) {
+            Integer idCat = libro.getCategoria().getIdCategoria();
+            if (idCat != null) {
+                Categoria categoria = categoriaRepository.findById(idCat).orElse(null);
+                libroExistente.setCategoria(categoria);
+            }
+        }
+
 
         return libroRepository.save(libroExistente);
     }
 
+
     @Override
     public void delete(int id) {
-    if (libroRepository.existsById(id)){
-        libroRepository.deleteById(id);
-    }
+        if (libroRepository.existsById(id)){
+            libroRepository.deleteById(id);
+        }
     }
 }
